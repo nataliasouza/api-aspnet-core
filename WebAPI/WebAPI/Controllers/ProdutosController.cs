@@ -18,16 +18,9 @@ namespace WebAPI.Controllers
         {
             _context = contexto;
         }
-        [HttpPost]
-        public ActionResult BuscarProduto([FromBody]Produto produto)
-        {
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
-            return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
-        }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get()
+        public ActionResult<IEnumerable<Produto>> BuscarProduto()
         {
             return _context.Produtos.AsNoTracking().ToList();
         }
@@ -41,6 +34,14 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
             return produto;
+        }
+
+        [HttpPost]
+        public ActionResult SalvarProduto([FromBody] Produto produto)
+        {
+            _context.Produtos.Add(produto);
+            _context.SaveChanges();
+            return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
         }
 
         [HttpPut("{id}")]
