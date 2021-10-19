@@ -35,6 +35,11 @@ namespace WebAPI.Controllers
             }
             return categoria;
         }
+        [HttpGet("produtos")]
+        public ActionResult<IEnumerable<Categoria>> Get()
+        {
+            return _context.Categorias.Include(x=> x.Produtos).ToList();
+        }
 
         [HttpPost]
         public ActionResult SalvarCategoria([FromBody] Categoria categoria)
@@ -54,6 +59,7 @@ namespace WebAPI.Controllers
             _context.Entry(categoria).State = EntityState.Modified;
             _context.SaveChanges();
             return Ok();
+
         }
         [HttpDelete("{id}")]
         public ActionResult<Categoria> DeletarCategoria(int id)

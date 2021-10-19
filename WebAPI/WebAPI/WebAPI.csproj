@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20211012025627_Inicial.cs" />
+    <Compile Remove="Migrations\20211012025627_Inicial.Designer.cs" />
+    <Compile Remove="Migrations\20211012031810_Populadb.cs" />
+    <Compile Remove="Migrations\20211012031810_Populadb.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.19">
       <PrivateAssets>all</PrivateAssets>
