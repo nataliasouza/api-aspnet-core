@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,52 +23,88 @@ namespace WebAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> BuscarProduto()
         {
-            return _context.Produtos.AsNoTracking().ToList();
+            try
+            {
+                return _context.Produtos.AsNoTracking().ToList();
+            }
+            catch(Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao tentar obter os produtos!");
+            }
         }
 
         [HttpGet("{id}", Name ="ObterProduto")]
         public ActionResult<Produto> BuscarProdutoPorId(int id)
         {
-            var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
-            if(produto == null)
+            try
             {
-                return NotFound();
+                var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
+                if (produto == null)
+                {
+                    return NotFound($"O produto com id ={id} não foi encontrado");
+                }
+                return produto;
             }
-            return produto;
+            catch(Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar obter o produto: {id}!");
+            }
+            
         }
 
         [HttpPost]
         public ActionResult SalvarProduto([FromBody] Produto produto)
         {
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
-            return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
+            try
+            {
+                _context.Produtos.Add(produto);
+                _context.SaveChanges();
+                return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar salvar o produto: {produto}!");
+            }
         }
 
         [HttpPut("{id}")]
         public ActionResult AlterarProduto(int id, [FromBody]Produto produto)
         {
-            if( id!= produto.ProdutoId)
+            try
             {
-                return BadRequest();
+                if (id != produto.ProdutoId)
+                {
+                    return BadRequest();
+                }
+                _context.Entry(produto).State = EntityState.Modified;
+                _context.SaveChanges();
+                return Ok($"O Produto com o id ={id} foi atualizado");
             }
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
-            return Ok();
+            catch(Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao tentar alterar o produto!");
+            }
         }
         [HttpDelete("{id}")]
         public ActionResult<Produto> DeletarProduto(int id)
         {
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
-
-            if(produto == null)
+            try
             {
-                return NotFound();
-            }
+                var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
 
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
-            return produto;
+                if (produto == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Produtos.Remove(produto);
+                _context.SaveChanges();
+                return produto;
+            }
+            catch(Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar deletar o produto de id {id}!");
+            }
         }
 
     }
